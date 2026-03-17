@@ -1,5 +1,5 @@
 
-```markdown
+
 # ACRIS-SAM2 (SANSA) Official Guide
 
 This repository contains the official implementation of ACRIS-SAM2 (SANSA), a Few-Shot Segmentation model built upon SAM2 and CLIP. Below are the detailed instructions for environment setup, data preparation, weight acquisition, and testing.
@@ -8,7 +8,7 @@ This repository contains the official implementation of ACRIS-SAM2 (SANSA), a Fe
 
 * The underlying dependencies require PyTorch 2.7.1 with CUDA 12.6 support and its corresponding Torchvision 0.22.1.
 * You can install all necessary dependencies in one click using the provided `requirements.txt` file. Run the following command:
-  ```bash
+```bash
   pip install -r requirements.txt
 
 ```
