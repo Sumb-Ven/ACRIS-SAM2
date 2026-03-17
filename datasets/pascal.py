@@ -64,6 +64,17 @@ class DatasetPASCAL(Dataset):
             if line.strip():
                 img, mask = line.strip().split(' ')
                 self.data_list.append((img, mask))
+
+        # =======================================================
+        # 新增逻辑：如果是测试/验证集，通过随机采样（允许重复）凑足 1000 个样本
+        # =======================================================
+        if self.split != 'train':
+            target_num = 1000
+            if len(self.data_list) > 0:
+                # 使用固定种子确保测试结果可复现
+                random.seed(42)
+                self.data_list = random.choices(self.data_list, k=target_num)
+                print(f"[{self.split}] Resampled testing set to {len(self.data_list)} samples.")
             
         # 2. 读取 sub_class_file_list
         sub_class_file = os.path.join(self.base_path, f'fss_list/{split}/sub_class_file_list_{fold}.txt')
@@ -80,17 +91,13 @@ class DatasetPASCAL(Dataset):
         return os.path.join(self.datapath, path_str)
 
     def read_mask(self, mask_path):
-        """ 直接读取为 Tensor，对齐 COCO 加速逻辑 """
         return torch.tensor(np.array(Image.open(mask_path)))
 
     def __len__(self):
         return len(self.data_list)
-        # return len(self.data_list)
 
     def __getitem__(self, idx):
-        # =======================================================
         # 1. 加载 Query 图像与标签
-        # =======================================================
         image_path, label_path = self.data_list[idx]
         query_img_path = self._clean_path(image_path)
         query_mask_path = self._clean_path(label_path)
@@ -98,9 +105,7 @@ class DatasetPASCAL(Dataset):
         query_img_pil = Image.open(query_img_path).convert('RGB')
         query_mask_raw = self.read_mask(query_mask_path)
         
-        # =======================================================
         # 2. 类别提取与强制过滤
-        # =======================================================
         label_class = torch.unique(query_mask_raw).tolist()
         if 0 in label_class: label_class.remove(0)
         if 255 in label_class: label_class.remove(255)
@@ -122,9 +127,7 @@ class DatasetPASCAL(Dataset):
         mask_to_keep = torch.isin(base_query_mask, valid_classes)
         base_query_mask[~mask_to_keep] = 0
 
-        # =======================================================
         # 3. 严格防重的 Support 采样 
-        # =======================================================
         file_class_chosen = self.sub_class_file_list[class_chosen]
         num_file = len(file_class_chosen)
         
@@ -148,7 +151,6 @@ class DatasetPASCAL(Dataset):
             support_image_path_list.append(support_image_path)
             support_label_path_list.append(support_label_path)
 
-        # 真正读取被选中的 Support 图片 (加速处理)
         support_imgs_pil = []
         support_masks_tensors = []
         base_support_masks_tensors = []
@@ -164,7 +166,6 @@ class DatasetPASCAL(Dataset):
             mask_raw = self.read_mask(sup_mask_p)
             base_mask = mask_raw.clone()
             
-            # 对齐 COCO: 向量化二值化与过滤 support_mask
             mask = (mask_raw == class_chosen).float()
             
             valid_support_mask = torch.isin(base_mask, valid_classes)
@@ -173,10 +174,7 @@ class DatasetPASCAL(Dataset):
             support_masks_tensors.append(mask)
             base_support_masks_tensors.append(base_mask)
 
-        # =======================================================
-        # 4. SAM2 与 CLIP 预处理 (对齐 COCO 插值逻辑)
-        # =======================================================
-        # --- SAM2 处理 ---
+        # 4. SAM2 与 CLIP 预处理
         sam_query_img = self.transform(query_img_pil)
         sam_query_mask = F.interpolate(query_mask.unsqueeze(0).unsqueeze(0).float(), sam_query_img.size()[-2:], mode='nearest').squeeze()
         sam_base_query = F.interpolate(base_query_mask.unsqueeze(0).unsqueeze(0).float(), sam_query_img.size()[-2:], mode='nearest').squeeze()
@@ -191,7 +189,6 @@ class DatasetPASCAL(Dataset):
             for m in base_support_masks_tensors
         ])
 
-        # --- CLIP 处理 ---
         clip_query_img = self.clip_transform(query_img_pil)
         clip_support_imgs = torch.stack([self.clip_transform(img) for img in support_imgs_pil])
         clip_support_masks = torch.stack([
@@ -199,15 +196,12 @@ class DatasetPASCAL(Dataset):
             for m in support_masks_tensors
         ])
 
-        # =======================================================
         # 5. 构建增强属性提示词与 Batch 输出
-        # =======================================================
         text_prompt = f"a photo of a {class_name}"
         class_attributes = PASCAL_ATTRIBUTES.get(class_name, [])
         attribute_prompts = [text_prompt] + [f"the {class_name} has {attr}" for attr in class_attributes]
         attribute_prompts_str = ", ".join(attribute_prompts)
 
-        # 严格对齐 COCO 的输出字典 Keys 格式
         return {
             'query_img': sam_query_img,
             'clip_query_img': clip_query_img,
@@ -224,20 +218,17 @@ class DatasetPASCAL(Dataset):
         }
 
 def build(image_set, args):
-    img_size = 518  # 可按需修改为与 COCO 的 640 一致，或改为 args.image_size
-    
-    # SAM2 Transform
+    img_size = 518
     transform = transforms.Compose([
         transforms.Resize(size=(img_size, img_size)),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
     
-    # CLIP Transform
     try:
         _, clip_preprocess = clip.load("ViT-B/16", device='cuda', jit=False)
     except Exception as e:
-        print(f"[WARNING] CLIP load failed in pascal.py: {e}. Using fallback transform.")
+        print(f"[WARNING] CLIP load failed: {e}. Using fallback transform.")
         clip_preprocess = transform
     
     split_name = 'train' if image_set in ['train', 'trn'] else 'val'
