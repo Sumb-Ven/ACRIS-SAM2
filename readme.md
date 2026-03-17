@@ -1,8 +1,8 @@
 
 
-# ACRIS-SAM2 (SANSA) Official Guide
+# ACRIS-SAM2 Official Guide
 
-This repository contains the official implementation of ACRIS-SAM2 (SANSA), a Few-Shot Segmentation model built upon SAM2 and CLIP. Below are the detailed instructions for environment setup, data preparation, weight acquisition, and testing.
+This repository contains the official implementation of ACRIS-SAM2, a Few-Shot Segmentation model built upon SAM2 and CLIP. Below are the detailed instructions for environment setup, data preparation, weight acquisition, and testing.
 
 ## 1. Environment Setup
 
@@ -25,7 +25,7 @@ Before running evaluations, you need to download and correctly place the pre-tra
 
 * **SAM2 Weights:** Please place the downloaded foundational SAM2 visual encoder weights (e.g., `tiny`, `base`, `large`) into the `pretrain/` directory.
 * **CLIP Weights:** Please place the CLIP model weights (default is `ViT-B/16`) into the `~/.cache/clip/` directory.
-* **Result Weights (Checkpoints):** After downloading the trained SANSA model checkpoints (e.g., `checkpoint_best.pth`), please place them inside the `weights/` directory in your project root.
+* **Result Weights (Checkpoints):** After downloading the trained model checkpoints (e.g., `checkpoint_best.pth`), please place them inside the `weights/` directory in your project root.
 
 ## 4. Testing and Inference
 
