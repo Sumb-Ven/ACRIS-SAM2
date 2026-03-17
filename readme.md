@@ -9,7 +9,9 @@ This repository contains the official implementation of ACRIS-SAM2, a Few-Shot S
 * The underlying dependencies require PyTorch 2.7.1 with CUDA 12.6 support and its corresponding Torchvision 0.22.1.
 * You can install all necessary dependencies in one click using the provided `requirements.txt` file. Run the following command:
 ```bash
-  pip install -r requirements.txt
+    conda create --name acris-sam2 python=3.10 -y
+    conda activate acris-sam2
+    pip install -r requirements.txt
 
 ```
 
