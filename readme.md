@@ -32,7 +32,7 @@ Before running evaluations, you need to download and correctly place the pre-tra
 ## 4. Testing and Inference
 
 * The evaluation process is handled by `inference_fss.py`, which calculates the mIoU metric for few-shot segmentation tasks.
-* You can use the `torchrun` utility to launch the test, which supports distributed evaluation. Below is an example command for running a 1-shot evaluation on fold 0 of the `{coco|pascal_voc}` dataset:
+* You can use the `torchrun` utility to launch the test, which supports distributed evaluation. Below is an example command for running a 1-shot evaluation on fold 0 of the `coco or pascal_voc` dataset:
 ```bash
 CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node=1 inference_fss.py \
     --dataset_file {coco|pascal_voc} \
