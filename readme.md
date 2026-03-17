@@ -33,9 +33,9 @@ Before running evaluations, you need to download and correctly place the pre-tra
 * You can use the `torchrun` utility to launch the test, which supports distributed evaluation. Below is an example command for running a 1-shot evaluation on fold 0 of the `coco` dataset:
 ```bash
 CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node=1 inference_fss.py \
-    --dataset_file coco \
+    --dataset_file {coco|pascal_voc} \
     --fold 0 \
-    --resume weights/coco-1shot-fold0/checkpoint_best.pth \
+    --resume weights/{coco|pascal_voc}-1shot/fold0/checkpoint_best.pth \
     --name_exp eval \
     --shot 1 \
     --prompt mask \
