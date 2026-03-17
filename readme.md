@@ -25,7 +25,7 @@ Before running evaluations, you need to download and correctly place the pre-tra
 
 * **SAM2 Weights:** Please place the downloaded foundational SAM2 visual encoder weights (e.g., `tiny`, `base`, `large`) into the `pretrain/` directory.
 * **CLIP Weights:** Please place the CLIP model weights (default is `ViT-B/16`) into the `~/.cache/clip/` directory.
-* **Result Weights (Checkpoints):** After downloading the trained model checkpoints (e.g., `checkpoint_best.pth`), please place them inside the `weights/` directory in your project root.
+* **Result Weights (Checkpoints):** You can download the trained model checkpoints from [Google Drive](https://drive.google.com/...). After downloading (e.g., `checkpoint_best.pth`), please place them inside the `weights/` directory in your project root.
 
 ## 4. Testing and Inference
 
