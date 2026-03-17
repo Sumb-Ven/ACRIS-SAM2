@@ -23,9 +23,9 @@ This repository contains the official implementation of ACRIS-SAM2, a Few-Shot S
 
 Before running evaluations, you need to download and correctly place the pre-trained weights and model checkpoints:
 
-* **SAM2 Weights:** Please place the downloaded foundational SAM2 visual encoder weights (e.g., `tiny`, `base`, `large`) into the `pretrain/` directory.
+* **SAM2 Weights:** Please place the downloaded foundational SAM2 visual encoder weights (default is `large`) into the `pretrain/` directory.
 * **CLIP Weights:** Please place the CLIP model weights (default is `ViT-B/16`) into the `~/.cache/clip/` directory.
-* **Result Weights (Checkpoints):** You can download the trained model checkpoints from [Google Drive](https://drive.google.com/...). After downloading (e.g., `checkpoint_best.pth`), please place them inside the `weights/` directory in your project root.
+* **Result Weights (Checkpoints):** You can download the trained model checkpoints from [Google Drive](https://drive.google.com/drive/folders/1gyac8nUg4NPQFGTEDAgERYLkEE6mKP0B?usp=drive_link). After downloading (e.g., `checkpoint_best.pth`), please place them inside the `weights/` directory in your project root.
 
 ## 4. Testing and Inference
 
